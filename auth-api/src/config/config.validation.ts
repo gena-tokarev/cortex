@@ -7,7 +7,6 @@ export const envSchema = z.object({
   AUTH_REFRESH_TOKEN_SECRET: z.string().min(16),
   AUTH_ACCESS_TOKEN_TTL_SECONDS: z.coerce.number().int().positive(),
   AUTH_REFRESH_TOKEN_TTL_SECONDS: z.coerce.number().int().positive(),
-  AUTH_WEB_SESSION_MODE: z.enum(['token', 'cookie']).default('token'),
   AUTH_COOKIE_ACCESS_TOKEN_NAME: z
     .string()
     .min(1)

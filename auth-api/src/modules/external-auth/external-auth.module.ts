@@ -8,6 +8,7 @@ import { ExternalAuthController } from './external-auth.controller';
 import { ExternalAuthRedirectService } from './external-auth-redirect.service';
 import { ExternalAuthService } from './external-auth.service';
 import { GoogleAuthGuard } from './google/google-auth.guard';
+import { GoogleAuthStartGuard } from './google/google-auth-start.guard';
 import { GoogleStrategy } from './google/google.strategy';
 
 @Module({
@@ -18,6 +19,7 @@ import { GoogleStrategy } from './google/google.strategy';
     ExternalAuthCodeStore,
     ExternalAuthRedirectService,
     GoogleAuthGuard,
+    GoogleAuthStartGuard,
     GoogleStrategy,
   ],
   exports: [ExternalAuthService],

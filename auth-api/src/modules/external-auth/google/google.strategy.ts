@@ -4,7 +4,6 @@ import { PassportStrategy } from '@nestjs/passport';
 import {
   Profile,
   Strategy,
-  VerifyCallback,
 } from 'passport-google-oauth20';
 import type { AppEnv } from '../../../config/config.validation';
 import { ExternalAuthService } from '../external-auth.service';
@@ -28,13 +27,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     _accessToken: string,
     _refreshToken: string,
     profile: Profile,
-    done: VerifyCallback,
-  ): Promise<void> {
-    try {
-      const user = await this.externalAuthService.resolveGoogleUser(profile);
-      done(null, user satisfies IdentityUser);
-    } catch (error) {
-      done(error as Error, false);
-    }
+  ): Promise<IdentityUser> {
+    return this.externalAuthService.resolveGoogleUser(profile);
   }
 }

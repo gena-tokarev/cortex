@@ -1,15 +1,33 @@
-import type { AuthTokenPairDto, AuthUserDto } from '../../core/dto/auth-response.dto';
+import type {
+  AuthTokenPairDto,
+  AuthUserDto,
+} from '../../core/dto/auth-response.dto';
+
+export enum AuthPlatform {
+  Web = 'web',
+  Native = 'native',
+}
+
+export enum AuthSessionTransport {
+  Token = 'token',
+  Cookie = 'cookie',
+}
 
 export interface AuthenticatedSession {
   user: AuthUserDto;
   tokens: AuthTokenPairDto;
 }
 
+export interface AuthSessionContext {
+  platform: AuthPlatform;
+  transport: AuthSessionTransport;
+}
+
 export interface AuthRequestLike {
   headers: {
     authorization?: string;
     cookie?: string;
-    'x-auth-session-mode'?: string | string[];
+    'x-auth-platform'?: string | string[];
   };
 }
 

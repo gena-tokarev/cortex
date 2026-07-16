@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "src",
+    "types": ["node"],
+    "declaration": true,
+    "declarationMap": true,
+    "emitDeclarationOnly": false,
+    "sourceMap": true,
+    "inlineSources": true,
+    "target": "es2021"
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["dist", "src/**/*.spec.ts", "src/**/*.test.ts"]
+}

@@ -75,10 +75,18 @@ describe('Passkey Auth API flow', () => {
 
     const email = `${PASSKEY_FIXTURE_PREFIX}+${Date.now()}+auth@focoris.local`;
     const request = await axios.post('/api/auth/email/request', { email });
-    const login = await axios.post('/api/auth/email/verify-code', {
-      email,
-      code: request.data.dev.code,
-    });
+    const login = await axios.post(
+      '/api/auth/email/verify-code',
+      {
+        email,
+        code: request.data.dev.code,
+      },
+      {
+        headers: {
+          'x-auth-platform': 'native',
+        },
+      },
+    );
 
     const withToken = await axios.post(
       '/api/auth/passkey/register/start',

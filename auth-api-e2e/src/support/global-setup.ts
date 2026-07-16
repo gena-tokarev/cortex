@@ -8,8 +8,6 @@ import { PostgreSqlContainer } from '@testcontainers/postgresql';
 
 loadEnv({ path: 'auth-api-e2e/.env' });
 
-/* eslint-disable */
-var __TEARDOWN_MESSAGE__: string;
 const E2E_RUNTIME_PATH = join('auth-api-e2e', '.tmp', 'runtime.json');
 const WORKSPACE_ROOT = join(__dirname, '..', '..', '..');
 

@@ -59,6 +59,12 @@ Run all APIs in dev mode:
 pnpm exec nx run-many --target=serve --projects=@focoris/gateway,@focoris/auth-api,@focoris/skillbook-api --parallel
 ```
 
+If Nx file watching or auto-restart gets stuck even though the daemon looks like it is running, reset Nx and start again:
+
+```bash
+pnpm nx reset
+```
+
 Health checks:
 
 - `http://localhost:3000/api/health`

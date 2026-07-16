@@ -10,7 +10,8 @@ import {
   AuthErrorCode,
   AuthErrorResponseDto,
 } from '../../core/dto/auth-response.dto';
-import { GoogleAuthStartDto } from './dto/google-auth-start.dto';
+import { decodeBase64UrlJson, encodeBase64UrlJson } from '@focoris/encoding';
+import { AuthPlatform } from '../session/session.types';
 import type {
   ExternalAuthPlatform,
   ExternalAuthRedirectContext,
@@ -36,23 +37,24 @@ export class ExternalAuthRedirectService {
     );
   }
 
-  parseStartRequest(query: {
-    redirectUri?: QueryValue;
-    platform?: QueryValue;
-  }): ExternalAuthRedirectContext {
-    const redirectUri = this.getSingleQueryValue(query.redirectUri, 'redirectUri');
-    const platform = this.getPlatform(query.platform, redirectUri);
+  createState(
+    query: {
+      redirectUri?: QueryValue;
+    },
+    platform: ExternalAuthPlatform,
+  ): string {
+    const redirectUri = this.getSingleQueryValue(
+      query.redirectUri,
+      'redirectUri',
+    );
 
     this.assertAllowedRedirectUri(redirectUri, platform);
 
-    return {
+    const context = {
       redirectUri,
       platform,
-    } satisfies GoogleAuthStartDto;
-  }
-
-  createState(context: ExternalAuthRedirectContext): string {
-    const payload = Buffer.from(JSON.stringify(context)).toString('base64url');
+    } satisfies ExternalAuthRedirectContext;
+    const payload = encodeBase64UrlJson(context);
     const signature = this.sign(payload);
 
     return `${payload}.${signature}`;
@@ -73,9 +75,7 @@ export class ExternalAuthRedirectService {
     let context: ExternalAuthRedirectContext;
 
     try {
-      context = JSON.parse(
-        Buffer.from(payload, 'base64url').toString('utf8'),
-      ) as ExternalAuthRedirectContext;
+      context = decodeBase64UrlJson<ExternalAuthRedirectContext>(payload);
     } catch {
       throw new UnauthorizedException({
         statusCode: 401,
@@ -111,24 +111,6 @@ export class ExternalAuthRedirectService {
     return url.toString();
   }
 
-  private getPlatform(
-    platform: QueryValue,
-    redirectUri: string,
-  ): ExternalAuthPlatform {
-    const explicitPlatform = platform
-      ? this.getSingleQueryValue(platform, 'platform')
-      : undefined;
-
-    if (explicitPlatform === 'web' || explicitPlatform === 'native') {
-      return explicitPlatform;
-    }
-
-    const parsedUri = this.parseUrl(redirectUri);
-    return parsedUri.protocol === 'http:' || parsedUri.protocol === 'https:'
-      ? 'web'
-      : 'native';
-  }
-
   private assertAllowedRedirectUri(
     redirectUri: string,
     platform: ExternalAuthPlatform,
@@ -136,7 +118,7 @@ export class ExternalAuthRedirectService {
     const parsedUri = this.parseUrl(redirectUri);
 
     const isAllowed =
-      platform === 'web'
+      platform === AuthPlatform.Web
         ? this.isAllowedWebRedirectUri(parsedUri)
         : this.isAllowedNativeRedirectUri(parsedUri.toString());
 

@@ -4,6 +4,9 @@
   "files": [],
   "references": [
     {
+      "path": "./libs/encoding"
+    },
+    {
       "path": "./libs/auth-nest"
     },
     {
@@ -23,6 +26,9 @@
     },
     {
       "path": "./skillbook-api"
+    },
+    {
+      "path": "./web"
     }
   ]
 }

@@ -5,15 +5,16 @@ import {
   NestInterceptor,
 } from '@nestjs/common';
 import { map, type Observable } from 'rxjs';
-import type {
+import {
   LoginResponseDto,
   RegisterResponseDto,
 } from '../../../core/dto/auth-response.dto';
 import { AuthSessionService } from '../session.service';
-import type {
-  AuthenticatedSession,
-  AuthRequestLike,
-  AuthResponseLike,
+import {
+  AuthSessionTransport,
+  type AuthenticatedSession,
+  type AuthRequestLike,
+  type AuthResponseLike,
 } from '../session.types';
 
 @Injectable()
@@ -33,16 +34,16 @@ export class AuthSessionInterceptor
     const http = context.switchToHttp();
     const request = http.getRequest<AuthRequestLike>();
     const response = http.getResponse<AuthResponseLike>();
-    const sessionMode = this.authSessionService.resolveSessionMode(request);
+    const sessionContext = this.authSessionService.resolveSessionContext(request);
 
     return next.handle().pipe(
       map((session) => {
-        if (sessionMode === 'cookie') {
+        if (sessionContext.transport === AuthSessionTransport.Cookie) {
           this.authSessionService.setAuthCookies(response, session.tokens);
         }
 
         return this.authSessionService.createLoginResponse(
-          sessionMode,
+          sessionContext,
           session,
         );
       }),

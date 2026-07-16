@@ -6,3 +6,4 @@ packages:
   - 'auth-api-e2e'
   - 'skillbook-api'
   - 'skillbook-api-e2e'
+  - 'web'

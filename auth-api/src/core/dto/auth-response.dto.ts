@@ -14,17 +14,13 @@ export interface AuthTokenPairDto {
   expiresInSeconds: number;
 }
 
-export type AuthSessionMode = 'token' | 'cookie';
-
 export interface LoginResponseDto {
   user: AuthUserDto;
-  sessionMode: AuthSessionMode;
   tokens?: AuthTokenPairDto;
 }
 
 export interface RegisterResponseDto {
   user: AuthUserDto;
-  sessionMode: AuthSessionMode;
   tokens?: AuthTokenPairDto;
 }
 
@@ -39,7 +35,6 @@ export interface RequestEmailLoginResponseDto {
 }
 
 export interface RefreshResponseDto {
-  sessionMode: AuthSessionMode;
   tokens?: AuthTokenPairDto;
 }
 
@@ -53,6 +48,7 @@ export interface MeResponseDto {
 
 export enum AuthErrorCode {
   InvalidCredentials = 'AUTH_INVALID_CREDENTIALS',
+  InvalidAuthPlatform = 'AUTH_INVALID_AUTH_PLATFORM',
   EmailAlreadyTaken = 'AUTH_EMAIL_ALREADY_TAKEN',
   InvalidEmailLoginChallenge = 'AUTH_INVALID_EMAIL_LOGIN_CHALLENGE',
   InvalidRefreshToken = 'AUTH_INVALID_REFRESH_TOKEN',

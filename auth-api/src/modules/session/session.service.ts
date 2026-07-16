@@ -1,25 +1,29 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import type { AppEnv } from '../../config/config.validation';
-import type {
-  AuthSessionMode,
+import {
   AuthTokenPairDto,
   LoginResponseDto,
   RefreshResponseDto,
   RegisterResponseDto,
 } from '../../core/dto/auth-response.dto';
+import { AuthPlatform, AuthSessionTransport } from './session.types';
 import type {
   AuthenticatedSession,
   AuthRequestLike,
   AuthResponseLike,
   AuthCookieOptionsLike,
+  AuthSessionContext,
 } from './session.types';
+import {
+  AuthErrorCode,
+  type AuthErrorResponseDto,
+} from '../../core/dto/auth-response.dto';
 
-const SESSION_MODE_HEADER = 'x-auth-session-mode';
+const PLATFORM_HEADER = 'x-auth-platform';
 
 @Injectable()
 export class AuthSessionService {
-  private readonly defaultWebSessionMode: AuthSessionMode;
   private readonly accessTokenCookieName: string;
   private readonly refreshTokenCookieName: string;
   private readonly cookieDomain?: string;
@@ -28,9 +32,6 @@ export class AuthSessionService {
   private readonly refreshTokenTtlMilliseconds: number;
 
   constructor(configService: ConfigService<AppEnv, true>) {
-    this.defaultWebSessionMode = configService.getOrThrow(
-      'AUTH_WEB_SESSION_MODE',
-    );
     this.accessTokenCookieName = configService.getOrThrow(
       'AUTH_COOKIE_ACCESS_TOKEN_NAME',
     );
@@ -44,67 +45,80 @@ export class AuthSessionService {
       configService.getOrThrow('AUTH_REFRESH_TOKEN_TTL_SECONDS') * 1000;
   }
 
-  resolveSessionMode(request: AuthRequestLike): AuthSessionMode {
-    const headerValue = request.headers[SESSION_MODE_HEADER];
+  resolveSessionContext(request: AuthRequestLike): AuthSessionContext {
+    const headerValue = request.headers[PLATFORM_HEADER];
     const normalizedValue = Array.isArray(headerValue)
       ? headerValue[0]
       : headerValue;
 
-    if (normalizedValue === 'token' || normalizedValue === 'cookie') {
-      return normalizedValue;
+    if (normalizedValue === AuthPlatform.Web) {
+      return {
+        platform: AuthPlatform.Web,
+        transport: AuthSessionTransport.Cookie,
+      };
     }
 
-    return this.defaultWebSessionMode;
+    if (normalizedValue === AuthPlatform.Native) {
+      return {
+        platform: AuthPlatform.Native,
+        transport: AuthSessionTransport.Token,
+      };
+    }
+
+    throw new BadRequestException({
+      statusCode: 400,
+      code: AuthErrorCode.InvalidAuthPlatform,
+      message: `${PLATFORM_HEADER} must be one of: web, native`,
+    } satisfies AuthErrorResponseDto);
   }
 
   createLoginResponse(
-    sessionMode: AuthSessionMode,
+    sessionContext: AuthSessionContext,
     session: AuthenticatedSession,
   ): LoginResponseDto {
-    if (sessionMode === 'cookie') {
+    const { transport } = sessionContext;
+
+    if (transport === AuthSessionTransport.Cookie) {
       return {
         user: session.user,
-        sessionMode,
       };
     }
 
     return {
       user: session.user,
-      sessionMode,
       tokens: session.tokens,
     };
   }
 
   createRegisterResponse(
-    sessionMode: AuthSessionMode,
+    sessionContext: AuthSessionContext,
     session: AuthenticatedSession,
   ): RegisterResponseDto {
-    if (sessionMode === 'cookie') {
+    const { transport } = sessionContext;
+
+    if (transport === AuthSessionTransport.Cookie) {
       return {
         user: session.user,
-        sessionMode,
       };
     }
 
     return {
       user: session.user,
-      sessionMode,
       tokens: session.tokens,
     };
   }
 
   createRefreshResponse(
-    sessionMode: AuthSessionMode,
+    sessionContext: AuthSessionContext,
     tokens: AuthTokenPairDto,
   ): RefreshResponseDto {
-    if (sessionMode === 'cookie') {
-      return {
-        sessionMode,
-      };
+    const { transport } = sessionContext;
+
+    if (transport === AuthSessionTransport.Cookie) {
+      return {};
     }
 
     return {
-      sessionMode,
       tokens,
     };
   }
@@ -134,10 +148,13 @@ export class AuthSessionService {
     request: AuthRequestLike,
     payloadRefreshToken?: string,
   ): string | undefined {
-    return (
-      payloadRefreshToken ??
-      this.getCookieValue(request, this.refreshTokenCookieName)
-    );
+    const sessionContext = this.resolveSessionContext(request);
+
+    if (sessionContext.transport === AuthSessionTransport.Cookie) {
+      return this.getCookieValue(request, this.refreshTokenCookieName);
+    }
+
+    return payloadRefreshToken;
   }
 
   getAccessTokenFromRequest(request: AuthRequestLike): string | undefined {

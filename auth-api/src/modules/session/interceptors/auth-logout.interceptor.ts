@@ -7,7 +7,11 @@ import {
 import { map, type Observable } from 'rxjs';
 import type { LogoutResponseDto } from '../../../core/dto/auth-response.dto';
 import { AuthSessionService } from '../session.service';
-import type { AuthRequestLike, AuthResponseLike } from '../session.types';
+import {
+  AuthSessionTransport,
+  type AuthRequestLike,
+  type AuthResponseLike,
+} from '../session.types';
 
 @Injectable()
 export class AuthLogoutInterceptor
@@ -22,11 +26,11 @@ export class AuthLogoutInterceptor
     const http = context.switchToHttp();
     const request = http.getRequest<AuthRequestLike>();
     const response = http.getResponse<AuthResponseLike>();
-    const sessionMode = this.authSessionService.resolveSessionMode(request);
+    const sessionContext = this.authSessionService.resolveSessionContext(request);
 
     return next.handle().pipe(
       map((result) => {
-        if (sessionMode === 'cookie') {
+        if (sessionContext.transport === AuthSessionTransport.Cookie) {
           this.authSessionService.clearAuthCookies(response);
         }
 

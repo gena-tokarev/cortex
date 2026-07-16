@@ -15,6 +15,7 @@ import type { GoogleAuthStartDto } from './dto/google-auth-start.dto';
 import { ExternalAuthRedirectService } from './external-auth-redirect.service';
 import { ExternalAuthService } from './external-auth.service';
 import { GoogleAuthGuard } from './google/google-auth.guard';
+import { GoogleAuthStartGuard } from './google/google-auth-start.guard';
 import { AuthSessionInterceptor } from '../session/interceptors/auth-session.interceptor';
 import type { AuthenticatedSession } from '../session/session.types';
 
@@ -31,14 +32,14 @@ interface GoogleCallbackRequest {
   externalAuthError?: unknown;
 }
 
-@Controller('auth')
+@Controller('external-auth')
 export class ExternalAuthController {
   constructor(
     private readonly externalAuthService: ExternalAuthService,
     private readonly externalAuthRedirectService: ExternalAuthRedirectService,
   ) {}
 
-  @UseGuards(GoogleAuthGuard)
+  @UseGuards(GoogleAuthStartGuard)
   @Get('google')
   googleLogin(@Query() _query: GoogleAuthStartDto): void {}
 
