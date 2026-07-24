@@ -1,10 +1,4 @@
-import {
-  Controller,
-  Get,
-  Req,
-  Res,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Req, Res, UseGuards } from '@nestjs/common';
 import type { IdentityUser } from '../../identity/identity.types';
 import { ExternalAuthRedirectService } from '../external-auth-redirect.service';
 import { ExternalAuthService } from '../external-auth.service';
@@ -32,7 +26,7 @@ export class GoogleExternalAuthController {
   ) {}
 
   @UseGuards(GoogleAuthStartGuard)
-  @Get()
+  @Get('start')
   login(): void {}
 
   @UseGuards(GoogleAuthGuard)
