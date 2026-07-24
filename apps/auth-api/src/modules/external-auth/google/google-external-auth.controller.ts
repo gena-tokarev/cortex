@@ -26,7 +26,7 @@ export class GoogleExternalAuthController {
   ) {}
 
   @UseGuards(GoogleAuthStartGuard)
-  @Get('start')
+  @Get()
   login(): void {}
 
   @UseGuards(GoogleAuthGuard)
