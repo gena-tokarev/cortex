@@ -51,14 +51,17 @@ services:
     ports:
       - '${AUTH_API_PORT}:3001'
 
-  keycloak:
-    image: quay.io/keycloak/keycloak:26.2
-    command: start-dev
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    depends_on:
+      - auth-api
     environment:
-      KC_BOOTSTRAP_ADMIN_USERNAME: admin
-      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      AUTH_API_URL: ${AUTH_API_URL}
+      NODE_ENV: production
     ports:
-      - '8080:8080'
+      - '${WEB_PORT}:3000'
 
 volumes:
   postgres_data:
