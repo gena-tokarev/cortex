@@ -1,0 +1,19 @@
+{
+  "name": "@focoris/auth-api-e2e",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "e2e": "NODE_OPTIONS='--conditions=@focoris/source' jest --config jest.config.cjs --runInBand",
+    "lint": "eslint . --ext .ts"
+  },
+  "devDependencies": {
+    "@prisma/client": "^6.19.2",
+    "bcryptjs": "^3.0.0",
+    "dotenv": "^16.6.1",
+    "testcontainers": "^10.28.0"
+  },
+  "dependencies": {
+    "@focoris/auth-api": "workspace:*",
+    "@testcontainers/postgresql": "^11.12.0"
+  }
+}

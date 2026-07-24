@@ -10,25 +10,13 @@
       "path": "./libs/auth-nest"
     },
     {
-      "path": "./gateway-e2e"
+      "path": "./apps/auth-api-e2e"
     },
     {
-      "path": "./gateway"
+      "path": "./apps/auth-api"
     },
     {
-      "path": "./auth-api-e2e"
-    },
-    {
-      "path": "./auth-api"
-    },
-    {
-      "path": "./skillbook-api-e2e"
-    },
-    {
-      "path": "./skillbook-api"
-    },
-    {
-      "path": "./web"
+      "path": "./apps/web"
     }
   ]
 }

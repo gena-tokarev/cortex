@@ -1,146 +1,75 @@
-# Focoris Portal Monorepo
+# Focoris Workspace
 
-This repository contains a backend portal platform built with **Nx + NestJS**:
+This workspace is now Bun + Turborepo based.
 
-- **Gateway** (`@focoris/gateway`) as the single entry point
-- **Auth API** (`@focoris/auth-api`) as the shared authentication service
-- **Skillbook API** (`@focoris/skillbook-api`) as one domain app
-- Additional apps can be added behind the gateway using the same pattern
+Active projects:
 
-## Architecture
-
-All services expose routes under `/api`.
-
-- Gateway (port `3000`) proxies:
-  - `/api/auth/*` -> Auth API
-  - `/api/skill-book/*` -> Skillbook API
-- Auth API (port `3001`) serves auth-domain endpoints
-- Skillbook API (port `3002`) serves domain endpoints
-
-## Tech Stack
-
-- **Monorepo:** Nx 22
-- **Backend framework:** NestJS 11
-- **Build:** `@nx/webpack:webpack` + TypeScript
-- **Package manager:** pnpm
-- **Containerization:** Docker + Docker Compose
+- `apps/auth-api` - NestJS auth backend
+- `apps/auth-api-e2e` - auth end-to-end tests
+- `apps/web` - Next.js web app
+- `libs/auth-nest` and `libs/encoding` - shared workspace packages
 
 ## Prerequisites
 
+- Bun
 - Node.js 20+
-- pnpm 9+
-- Docker + Docker Compose (optional, for containerized run)
+- Docker
 
 ## Install
 
 ```bash
-pnpm install
+bun install
 ```
 
-## Run Locally
-
-Start PostgreSQL:
+## Common Commands
 
 ```bash
-docker compose up -d postgres
+bun run dev:web
+bun run dev:auth-api
+bun run build:web
+bun run build:auth-api
+bun run test:auth-api
+bun run e2e:auth-api
+bun run db:generate
+bun run db:migrate
+bun run db:seed
 ```
 
-Prepare auth database (once, or when schema changes):
+## Local Services
+
+Start infrastructure:
 
 ```bash
-pnpm exec nx run @focoris/auth-api:db:generate
-pnpm exec nx run @focoris/auth-api:db:migrate
-pnpm exec nx run @focoris/auth-api:db:seed
+docker compose up -d postgres redis
 ```
 
-Run all APIs in dev mode:
+Run the auth API:
 
 ```bash
-pnpm exec nx run-many --target=serve --projects=@focoris/gateway,@focoris/auth-api,@focoris/skillbook-api --parallel
+bun run dev:auth-api
 ```
 
-If Nx file watching or auto-restart gets stuck even though the daemon looks like it is running, reset Nx and start again:
+Run the web app:
 
 ```bash
-pnpm nx reset
+bun run dev:web
 ```
 
-Health checks:
-
-- `http://localhost:3000/api/health`
-- `http://localhost:3001/api/health`
-- `http://localhost:3002/api/health`
+The auth API listens on `http://localhost:3001/api` by default.
+The web app listens on `http://localhost:3000`.
 
 ## Auth E2E
 
-Auth e2e uses Testcontainers and starts its own isolated PostgreSQL instance automatically.
-The test setup:
+Auth e2e uses Testcontainers and starts isolated Postgres and Redis containers automatically.
 
-- loads `auth-api-e2e/.env`
-- starts a temporary PostgreSQL container
-- runs Prisma migrations against that container
-- starts `@focoris/auth-api` with `DATABASE_URL` and `PORT` injected from the e2e runtime
+Optional local env:
 
-This means e2e does not depend on a manually prepared local test database and does not need `auth-api/.env.test`.
+```bash
+cp apps/auth-api-e2e/.env.example apps/auth-api-e2e/.env
+```
 
 Run:
 
 ```bash
-pnpm exec nx run @focoris/auth-api-e2e:e2e
+bun run e2e:auth-api
 ```
-
-Optional local env file:
-
-```bash
-cp auth-api-e2e/.env.example auth-api-e2e/.env
-```
-
-CI target:
-
-```bash
-pnpm exec nx run @focoris/auth-api-e2e:e2e-ci
-```
-
-## Debug
-
-Run all APIs in debug mode:
-
-```bash
-pnpm exec nx run-many --target=serve --configuration=debug --projects=@focoris/gateway,@focoris/auth-api,@focoris/skillbook-api --parallel
-```
-
-VS Code launch configurations are in `.vscode/launch.json`:
-
-- `Debug @focoris/gateway with Nx`
-- `Debug @focoris/auth-api with Nx`
-- `Debug @focoris/skillbook-api with Nx`
-- `Debug All APIs`
-- `Debug All APIs with Nx run-many`
-
-## Run with Docker Compose
-
-Create root env file first:
-
-```bash
-cp .env.example .env
-```
-
-```bash
-docker compose up --build
-```
-
-Stop:
-
-```bash
-docker compose down
-```
-
-Gateway is reachable at `http://localhost:3000`.
-PostgreSQL is reachable at `localhost:5432`.
-
-## Project Structure
-
-- `gateway/` - API gateway and proxy routing
-- `auth-api/` - centralized auth service
-- `skillbook-api/` - domain app service
-- `*-e2e/` - e2e test projects
