@@ -29,6 +29,7 @@ export class GoogleAuthStartGuard extends GoogleAuthGuard {
 
     return {
       session: false,
+      prompt: 'select_account',
       state: this.externalAuthRedirectService.createState(
         request.query,
         sessionContext.platform,
