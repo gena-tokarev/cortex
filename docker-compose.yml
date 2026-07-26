@@ -63,6 +63,7 @@ services:
       - auth-api
     environment:
       AUTH_API_URL: ${AUTH_API_URL}
+      WEB_APP_ORIGIN: ${WEB_APP_ORIGIN}
       NODE_ENV: production
     ports:
       - '127.0.0.1:${WEB_PORT:-3000}:3000'
