@@ -6,8 +6,7 @@ import {
 } from '@/lib/auth';
 
 export async function GET(request: Request) {
-  const url = new URL(request.url);
-  const origin = url.origin;
+  const origin = getPublicOrigin(request);
   const redirectUri = `${origin}/auth/callback`;
   const startUrl = new URL(`${getAuthApiBaseUrl()}/api/external-auth/google`);
 
@@ -28,4 +27,31 @@ export async function GET(request: Request) {
   }
 
   return NextResponse.json(await response.json(), { status: response.status });
+}
+
+function getPublicOrigin(request: Request): string {
+  const requestUrl = new URL(request.url);
+  const forwardedProto = getFirstHeaderValue(
+    request.headers.get('x-forwarded-proto'),
+  );
+  const forwardedHost = getFirstHeaderValue(
+    request.headers.get('x-forwarded-host'),
+  );
+
+  if (
+    !forwardedHost ||
+    (forwardedProto !== 'http' && forwardedProto !== 'https')
+  ) {
+    return requestUrl.origin;
+  }
+
+  try {
+    return new URL(`${forwardedProto}://${forwardedHost}`).origin;
+  } catch {
+    return requestUrl.origin;
+  }
+}
+
+function getFirstHeaderValue(value: string | null): string | null {
+  return value?.split(',', 1)[0]?.trim() || null;
 }
