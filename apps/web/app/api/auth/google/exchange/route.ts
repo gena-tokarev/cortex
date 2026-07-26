@@ -27,7 +27,7 @@ export async function POST(request: Request) {
   }
 
   const response = await fetch(
-    `${getAuthApiBaseUrl()}/api/external-auth/google/exchange`,
+    `${getAuthApiBaseUrl()}/api/external-auth/exchange`,
     {
       method: 'POST',
       headers: {
