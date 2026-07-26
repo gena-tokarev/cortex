@@ -72,7 +72,7 @@ function AuthCallbackContent() {
 
     async function completeLogin() {
       try {
-        const response = await fetch('/api/auth/google/exchange', {
+        const response = await fetch('/web-api/auth/google/exchange', {
           method: 'POST',
           headers: {
             'content-type': 'application/json',

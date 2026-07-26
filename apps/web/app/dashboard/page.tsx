@@ -29,7 +29,7 @@ export default function DashboardPage() {
 
     async function loadCurrentUser() {
       try {
-        const response = await fetch('/api/auth/me', {
+        const response = await fetch('/web-api/auth/me', {
           cache: 'no-store',
         });
 
@@ -92,7 +92,7 @@ export default function DashboardPage() {
               setIsSigningOut(true);
 
               try {
-                await fetch('/api/auth/logout', {
+                await fetch('/web-api/auth/logout', {
                   method: 'POST',
                 });
               } finally {

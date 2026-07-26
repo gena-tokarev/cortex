@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import { ArrowRight, Globe, KeyRound, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -79,13 +78,13 @@ export default function AuthPage() {
                 className="w-full justify-between"
                 size="lg"
               >
-                <Link href="/api/auth/google/start">
+                <a href="/web-api/auth/google/start">
                   <span className="inline-flex items-center gap-2">
                     <Globe className="size-4" />
                     Continue with Google
                   </span>
                   <ArrowRight className="size-4" />
-                </Link>
+                </a>
               </Button>
 
               <div className="flex items-center gap-4">
