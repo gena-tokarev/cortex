@@ -1,0 +1,19 @@
+services:
+  auth-api:
+    networks:
+      default: {}
+      shared_proxy:
+        aliases:
+          - focoris-auth-api
+
+  web:
+    networks:
+      default: {}
+      shared_proxy:
+        aliases:
+          - focoris-web
+
+networks:
+  shared_proxy:
+    external: true
+    name: shared_proxy
