@@ -49,7 +49,9 @@ Thumbs.db
 test-output
 
 .env
+.env.docker
 !.env.example
+!.env.docker.example
 auth-api/.env.test
 # E2E runtime artifacts
 auth-api-e2e/.tmp/

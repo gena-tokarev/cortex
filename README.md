@@ -58,6 +58,23 @@ bun run dev:web
 The auth API listens on `http://localhost:3001/api` by default.
 The web app listens on `http://localhost:3000`.
 
+## VPS deployment
+
+The production containers join the external `shared_proxy` Docker network using
+the aliases `focoris-web` and `focoris-auth-api`. Public HTTPS and `/api/`
+routing are owned by the sibling `infra` repository.
+
+```bash
+cp .env.docker.example .env.docker
+# Replace every placeholder in .env.docker.
+docker network inspect shared_proxy >/dev/null 2>&1 || docker network create shared_proxy
+docker compose --env-file .env.docker up --build -d
+```
+
+The web and API ports are bound to loopback for VPS diagnostics; public traffic
+reaches the containers over `shared_proxy`. `AUTH_API_URL` is intentionally the
+internal Docker URL used by server-side web routes.
+
 ## Auth E2E
 
 Auth e2e uses Testcontainers and starts isolated Postgres and Redis containers automatically.
