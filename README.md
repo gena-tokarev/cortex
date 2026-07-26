@@ -79,15 +79,13 @@ cp .env.example .env.dev  # first-time setup only
 # Then copy .env.dev to the VPS.
 cp .env.dev .env
 docker network inspect shared_proxy >/dev/null 2>&1 || docker network create shared_proxy
-docker compose \
-  -f docker-compose.yml \
-  -f docker-compose.dev.yml \
-  up --build -d
+docker compose up --build -d
 ```
 
 The web and API ports are bound to loopback for VPS diagnostics; public traffic
 reaches the containers over `shared_proxy`. `AUTH_API_URL` is intentionally the
-internal Docker URL used by server-side web routes.
+internal Docker URL used by server-side web routes. `COMPOSE_FILE` in each
+profile selects either the base Compose file or the base plus dev override.
 
 ## Auth E2E
 
