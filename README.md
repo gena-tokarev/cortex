@@ -35,12 +35,10 @@ bun run db:migrate
 bun run db:seed
 ```
 
-## Environment profiles
+## Local development
 
-### Local development without Dockerized apps
-
-The applications run on the host. Postgres and Redis are reached through
-`localhost` (they may still be started as supporting containers).
+The web and auth API run on the host with Bun. The root `compose.yml` contains
+only Postgres and Redis, exposed on loopback for the local applications.
 
 ```bash
 cp .env.example .env.local  # first-time setup only
@@ -50,28 +48,14 @@ bun run dev
 ```
 
 The auth API listens on `http://localhost:3001/api` by default.
-The web app listens on `http://localhost:3000`.
-
-### Local development with Docker
-
-All four services run in Docker. Container-to-container URLs use the Compose
-service names `postgres`, `redis`, and `auth-api`, while ports 3000/3001 remain
-available on localhost.
-
-```bash
-cp .env.example .env.local-docker  # first-time setup only
-# Change DATABASE_URL, REDIS_URL, and AUTH_API_URL to Docker service names.
-cp .env.local-docker .env           # activate this profile
-docker compose up --build -d
-```
-
-This mode does not require `shared_proxy`.
+The web app listens on `http://localhost:3000`. Application Dockerfiles are
+built by CI; local full-stack Compose is intentionally not maintained.
 
 ### Public VPS development environment
 
 The VPS deployment is image-based and is described under
 [Development CI/CD](#development-cicd). It uses
-`deploy/compose.development.yml`, not the local Compose files.
+`deploy/compose.development.yml`, not the local `compose.yml`.
 
 ## Auth E2E
 

@@ -23,6 +23,8 @@ RUN bun run build:auth-api
 FROM manifests AS production-dependencies
 
 RUN bun install --frozen-lockfile --production --filter @focoris/auth-api
+COPY apps/auth-api/prisma/schema.prisma apps/auth-api/prisma/schema.prisma
+RUN bunx --bun prisma generate --schema apps/auth-api/prisma/schema.prisma
 
 FROM node:22-alpine AS runner
 
@@ -32,7 +34,6 @@ ENV NODE_ENV=production
 ENV PORT=3001
 
 COPY --from=production-dependencies --chown=node:node /app/node_modules ./node_modules
-COPY --from=builder --chown=node:node /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder --chown=node:node /app/apps/auth-api/dist ./apps/auth-api/dist
 COPY --from=builder --chown=node:node /app/apps/auth-api/package.json ./apps/auth-api/package.json
 COPY --from=builder --chown=node:node /app/apps/auth-api/prisma ./apps/auth-api/prisma
