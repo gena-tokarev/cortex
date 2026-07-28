@@ -11,7 +11,7 @@ COPY libs/encoding/package.json libs/encoding/package.json
 
 RUN bun install --frozen-lockfile
 
-FROM node:22-alpine AS builder
+FROM node:26-alpine AS builder
 
 WORKDIR /app
 
@@ -23,7 +23,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 
 RUN cd /app/apps/web && node ../../node_modules/next/dist/bin/next build
 
-FROM node:22-alpine AS runner
+FROM node:26-alpine AS runner
 
 WORKDIR /app
 
