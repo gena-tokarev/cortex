@@ -26,7 +26,7 @@ RUN bun install --frozen-lockfile --production --filter @focoris/auth-api
 COPY apps/auth-api/prisma/schema.prisma apps/auth-api/prisma/schema.prisma
 RUN bunx --bun prisma generate --schema apps/auth-api/prisma/schema.prisma
 
-FROM node:22-alpine AS runner
+FROM node:26-alpine AS runner
 
 WORKDIR /app
 
