@@ -1,0 +1,222 @@
+name: Deploy development
+
+on:
+  workflow_call:
+    inputs:
+      auth_image:
+        description: Immutable auth API image reference
+        required: true
+        type: string
+      web_image:
+        description: Immutable web image reference
+        required: true
+        type: string
+      source_sha:
+        description: Source commit represented by the images
+        required: true
+        type: string
+      enforce_current_main:
+        description: Skip deployment when source_sha is no longer main
+        required: false
+        default: true
+        type: boolean
+  workflow_dispatch:
+    inputs:
+      commit_sha:
+        description: Full 40-character commit SHA to roll back to
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+env:
+  AUTH_API_REPOSITORY: ghcr.io/gena-tokarev/focoris-auth-api
+  WEB_REPOSITORY: ghcr.io/gena-tokarev/focoris-web
+
+jobs:
+  deploy:
+    name: Deploy immutable images
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment:
+      name: development
+      url: https://focoris-dev.podolog-warsaw.pl
+    env:
+      DEPLOY_HOST: ${{ vars.DEPLOY_HOST }}
+      DEPLOY_PORT: ${{ vars.DEPLOY_PORT }}
+      DEPLOY_USER: ${{ vars.DEPLOY_USER }}
+      DEPLOY_PATH: ${{ vars.DEPLOY_PATH }}
+      DEPLOY_SSH_KNOWN_HOSTS: ${{ vars.DEPLOY_SSH_KNOWN_HOSTS }}
+      DEPLOY_SSH_PRIVATE_KEY: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
+    concurrency:
+      group: development-deployment
+      cancel-in-progress: false
+    steps:
+      - name: Check out deployment assets
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c # v4.2.0
+
+      - name: Resolve release images
+        id: release
+        env:
+          CALLED_AUTH_IMAGE: ${{ inputs.auth_image }}
+          CALLED_WEB_IMAGE: ${{ inputs.web_image }}
+          CALLED_SOURCE_SHA: ${{ inputs.source_sha }}
+          MANUAL_COMMIT_SHA: ${{ inputs.commit_sha }}
+        run: |
+          set -eu
+
+          if [ -n "${CALLED_AUTH_IMAGE:-}" ]; then
+            auth_image=$CALLED_AUTH_IMAGE
+            web_image=$CALLED_WEB_IMAGE
+            source_sha=$CALLED_SOURCE_SHA
+          else
+            source_sha=$MANUAL_COMMIT_SHA
+            if ! printf '%s\n' "$source_sha" | grep -Eq '^[0-9a-f]{40}$'; then
+              echo "Rollback requires a lowercase, full 40-character commit SHA." >&2
+              exit 1
+            fi
+
+            auth_tag="${AUTH_API_REPOSITORY}:sha-${source_sha}"
+            web_tag="${WEB_REPOSITORY}:sha-${source_sha}"
+            auth_digest=$(docker buildx imagetools inspect "$auth_tag" | awk '$1 == "Digest:" { print $2; exit }')
+            web_digest=$(docker buildx imagetools inspect "$web_tag" | awk '$1 == "Digest:" { print $2; exit }')
+            auth_image="${AUTH_API_REPOSITORY}@${auth_digest}"
+            web_image="${WEB_REPOSITORY}@${web_digest}"
+          fi
+
+          printf '%s\n' "$auth_image" |
+            grep -Eq '^ghcr\.io/gena-tokarev/focoris-auth-api@sha256:[0-9a-f]{64}$'
+          printf '%s\n' "$web_image" |
+            grep -Eq '^ghcr\.io/gena-tokarev/focoris-web@sha256:[0-9a-f]{64}$'
+
+          {
+            echo "auth_image=$auth_image"
+            echo "web_image=$web_image"
+            echo "source_sha=$source_sha"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Skip stale automatic deployment
+        id: currency
+        env:
+          SOURCE_SHA: ${{ steps.release.outputs.source_sha }}
+          ENFORCE_CURRENT_MAIN: ${{ inputs.enforce_current_main }}
+        run: |
+          set -eu
+          should_deploy=true
+
+          if [ "$ENFORCE_CURRENT_MAIN" = "true" ]; then
+            current_main=$(git ls-remote origin refs/heads/main | awk '{ print $1 }')
+            if [ "$current_main" != "$SOURCE_SHA" ]; then
+              echo "Skipping stale deployment for $SOURCE_SHA; main is $current_main."
+              should_deploy=false
+            fi
+          fi
+
+          echo "should_deploy=$should_deploy" >> "$GITHUB_OUTPUT"
+
+      - name: Verify anonymous image access
+        if: steps.currency.outputs.should_deploy == 'true'
+        env:
+          AUTH_IMAGE: ${{ steps.release.outputs.auth_image }}
+          WEB_IMAGE: ${{ steps.release.outputs.web_image }}
+        run: |
+          set -eu
+          docker buildx imagetools inspect "$AUTH_IMAGE" >/dev/null
+          docker buildx imagetools inspect "$WEB_IMAGE" >/dev/null
+
+      - name: Configure SSH
+        if: steps.currency.outputs.should_deploy == 'true'
+        run: |
+          set -eu
+          : "${DEPLOY_HOST:?DEPLOY_HOST is not configured}"
+          : "${DEPLOY_PORT:?DEPLOY_PORT is not configured}"
+          : "${DEPLOY_USER:?DEPLOY_USER is not configured}"
+          : "${DEPLOY_PATH:?DEPLOY_PATH is not configured}"
+          : "${DEPLOY_SSH_KNOWN_HOSTS:?DEPLOY_SSH_KNOWN_HOSTS is not configured}"
+          : "${DEPLOY_SSH_PRIVATE_KEY:?DEPLOY_SSH_PRIVATE_KEY is not configured}"
+
+          install -m 700 -d "$HOME/.ssh"
+          printf '%s\n' "$DEPLOY_SSH_PRIVATE_KEY" > "$HOME/.ssh/id_ed25519"
+          chmod 600 "$HOME/.ssh/id_ed25519"
+          printf '%s\n' "$DEPLOY_SSH_KNOWN_HOSTS" > "$HOME/.ssh/known_hosts"
+          chmod 600 "$HOME/.ssh/known_hosts"
+
+      - name: Upload deployment assets
+        if: steps.currency.outputs.should_deploy == 'true'
+        env:
+          UPLOAD_NAME: .deploy-upload-${{ github.run_id }}-${{ github.run_attempt }}
+        run: |
+          set -eu
+          ssh \
+            -o BatchMode=yes \
+            -o IdentitiesOnly=yes \
+            -o StrictHostKeyChecking=yes \
+            -p "$DEPLOY_PORT" \
+            "$DEPLOY_USER@$DEPLOY_HOST" \
+            bash -s -- "$DEPLOY_PATH" "$UPLOAD_NAME" <<'REMOTE'
+          set -eu
+          deploy_path=$1
+          upload_name=$2
+          case "$upload_name" in
+            .deploy-upload-[0-9]*-[0-9]*) ;;
+            *) echo "Invalid upload directory name." >&2; exit 1 ;;
+          esac
+          test -d "$deploy_path"
+          test -f "$deploy_path/.env"
+          install -d -m 700 "$deploy_path/$upload_name"
+          REMOTE
+
+          scp \
+            -o BatchMode=yes \
+            -o IdentitiesOnly=yes \
+            -o StrictHostKeyChecking=yes \
+            -P "$DEPLOY_PORT" \
+            deploy/compose.development.yml \
+            deploy/deploy.sh \
+            "$DEPLOY_USER@$DEPLOY_HOST:$DEPLOY_PATH/$UPLOAD_NAME/"
+
+      - name: Deploy release
+        if: steps.currency.outputs.should_deploy == 'true'
+        env:
+          UPLOAD_NAME: .deploy-upload-${{ github.run_id }}-${{ github.run_attempt }}
+          AUTH_IMAGE: ${{ steps.release.outputs.auth_image }}
+          WEB_IMAGE: ${{ steps.release.outputs.web_image }}
+        run: |
+          set -eu
+          ssh \
+            -o BatchMode=yes \
+            -o IdentitiesOnly=yes \
+            -o StrictHostKeyChecking=yes \
+            -p "$DEPLOY_PORT" \
+            "$DEPLOY_USER@$DEPLOY_HOST" \
+            bash -s -- "$DEPLOY_PATH" "$UPLOAD_NAME" "$AUTH_IMAGE" "$WEB_IMAGE" <<'REMOTE'
+          set -eu
+          deploy_path=$1
+          upload_name=$2
+          auth_image=$3
+          web_image=$4
+          upload_path="$deploy_path/$upload_name"
+
+          cleanup() {
+            rm -f \
+              "$upload_path/compose.development.yml" \
+              "$upload_path/deploy.sh"
+            rmdir "$upload_path" 2>/dev/null || true
+          }
+          trap cleanup EXIT
+
+          install -m 644 \
+            "$upload_path/compose.development.yml" \
+            "$deploy_path/compose.development.yml.next"
+          install -m 755 \
+            "$upload_path/deploy.sh" \
+            "$deploy_path/deploy.sh.next"
+          mv "$deploy_path/compose.development.yml.next" "$deploy_path/compose.development.yml"
+          mv "$deploy_path/deploy.sh.next" "$deploy_path/deploy.sh"
+
+          "$deploy_path/deploy.sh" "$deploy_path" "$auth_image" "$web_image"
+          REMOTE

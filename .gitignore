@@ -59,3 +59,8 @@ auth-api/.env.test
 auth-api-e2e/.tmp/
 
 __azurite_db_queue*
+
+# Local deployment credentials and host verification
+focoris-actions-deploy
+focoris-actions-deploy.pub
+focoris-vps-known-hosts

@@ -88,10 +88,39 @@ module.exports = async function () {
 
   const dbUrl = `${postgres.getConnectionUri()}?schema=public`;
   const redisUrl = `redis://${redis.getHost()}:${redis.getMappedPort(6379)}`;
-  const { NODE_OPTIONS, VSCODE_INSPECTOR_OPTIONS, ...baseEnv } = process.env;
+  const baseEnv = { ...process.env };
+  delete baseEnv.NODE_OPTIONS;
+  delete baseEnv.VSCODE_INSPECTOR_OPTIONS;
   const commandEnv = {
     ...baseEnv,
+    AUTH_ACCESS_TOKEN_SECRET:
+      process.env.AUTH_ACCESS_TOKEN_SECRET ?? 'e2e-access-token-secret',
+    AUTH_ACCESS_TOKEN_TTL_SECONDS:
+      process.env.AUTH_ACCESS_TOKEN_TTL_SECONDS ?? '900',
+    AUTH_COOKIE_SAME_SITE: process.env.AUTH_COOKIE_SAME_SITE ?? 'lax',
+    AUTH_COOKIE_SECURE: process.env.AUTH_COOKIE_SECURE ?? 'false',
+    AUTH_REFRESH_TOKEN_SECRET:
+      process.env.AUTH_REFRESH_TOKEN_SECRET ?? 'e2e-refresh-token-secret',
+    AUTH_REFRESH_TOKEN_TTL_SECONDS:
+      process.env.AUTH_REFRESH_TOKEN_TTL_SECONDS ?? '604800',
     DATABASE_URL: dbUrl,
+    GOOGLE_ALLOWED_NATIVE_REDIRECT_URIS:
+      process.env.GOOGLE_ALLOWED_NATIVE_REDIRECT_URIS ??
+      'focoris://auth/callback',
+    GOOGLE_ALLOWED_WEB_REDIRECT_URIS:
+      process.env.GOOGLE_ALLOWED_WEB_REDIRECT_URIS ??
+      `http://${host}:${authApiPort}`,
+    GOOGLE_CALLBACK_URL:
+      process.env.GOOGLE_CALLBACK_URL ??
+      `http://${host}:${authApiPort}/api/external-auth/google/callback`,
+    GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID ?? 'e2e-google-client-id',
+    GOOGLE_CLIENT_SECRET:
+      process.env.GOOGLE_CLIENT_SECRET ?? 'e2e-google-client-secret',
+    PASSKEY_ALLOWED_ORIGINS:
+      process.env.PASSKEY_ALLOWED_ORIGINS ??
+      `http://${host}:${authApiPort}`,
+    PASSKEY_RP_ID: process.env.PASSKEY_RP_ID ?? host,
+    PASSKEY_RP_NAME: process.env.PASSKEY_RP_NAME ?? 'Focoris E2E',
     PORT: String(authApiPort),
     REDIS_URL: redisUrl,
   };
@@ -113,12 +142,16 @@ module.exports = async function () {
     join(WORKSPACE_ROOT, 'apps', 'auth-api'),
   );
 
-  const authApiProcess = spawn(BUN_BINARY, ['run', 'dev:auth-api'], {
-    env: commandEnv,
-    cwd: WORKSPACE_ROOT,
-    stdio: 'ignore',
-    detached: true,
-  });
+  const authApiProcess = spawn(
+    process.execPath,
+    [join(WORKSPACE_ROOT, 'apps', 'auth-api', 'dist', 'main.js')],
+    {
+      env: commandEnv,
+      cwd: WORKSPACE_ROOT,
+      stdio: 'inherit',
+      detached: true,
+    },
+  );
   authApiProcess.unref();
 
   await waitForPortOpen(authApiPort, host);

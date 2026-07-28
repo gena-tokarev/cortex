@@ -8,7 +8,7 @@
     "dev:debug": "nest start --debug --watch",
     "lint": "eslint . --ext .ts",
     "start": "node dist/main.js",
-    "test": "NODE_OPTIONS='--conditions=@focoris/source' jest --config jest.config.cts --runInBand",
+    "test": "NODE_OPTIONS='--conditions=@focoris/source' jest --config jest.config.cjs --runInBand",
     "db:generate": "prisma generate --schema prisma/schema.prisma",
     "db:migrate": "prisma migrate dev --schema prisma/schema.prisma",
     "db:seed": "prisma db seed --schema prisma/schema.prisma"
@@ -24,6 +24,8 @@
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.0.0",
     "@prisma/client": "^6.19.2",
+    "@focoris/auth-nest": "workspace:*",
+    "@focoris/encoding": "workspace:*",
     "@simplewebauthn/server": "^13.3.1",
     "bcryptjs": "^3.0.0",
     "class-transformer": "^0.5.1",
@@ -34,17 +36,15 @@
     "passport-local": "^1.0.0",
     "redis": "^6.0.0",
     "reflect-metadata": "^0.1.13",
+    "prisma": "^6.16.2",
     "rxjs": "^7.8.0",
     "tslib": "^2.3.0",
     "zod": "^3.24.1"
   },
   "devDependencies": {
-    "@focoris/encoding": "workspace:*",
-    "@focoris/auth-nest": "workspace:*",
     "@nestjs/testing": "^11.0.0",
     "@types/passport-google-oauth20": "^2.0.16",
     "@types/passport-jwt": "^4.0.1",
-    "@types/passport-local": "^1.0.38",
-    "prisma": "^6.16.2"
+    "@types/passport-local": "^1.0.38"
   }
 }
