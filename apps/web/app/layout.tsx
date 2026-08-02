@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'Focoris Web',
-  description: 'Authentication entry point for the Focoris web app.',
+  title: 'Cortex Web',
+  description: 'Authentication entry point for the Cortex web app.',
   robots: {
     index: false,
     follow: false,

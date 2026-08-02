@@ -7,7 +7,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { Prisma } from '@prisma/client';
 import { createHash, randomUUID } from 'crypto';
-import { AuthJwtPayload, JwtTokenType } from '@focoris/auth-nest';
+import { AuthJwtPayload, JwtTokenType } from '@cortex/auth-nest';
 import type { AppEnv } from '../../config/config.validation';
 import {
   AuthErrorCode,

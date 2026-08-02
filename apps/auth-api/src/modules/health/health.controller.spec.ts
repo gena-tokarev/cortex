@@ -17,6 +17,12 @@ describe('HealthController', () => {
     jest.clearAllMocks();
   });
 
+  it('returns ok without checking dependencies for liveness', () => {
+    expect(new HealthController(prisma, redis).live()).toEqual({ status: 'ok' });
+    expect(queryRaw).not.toHaveBeenCalled();
+    expect(ping).not.toHaveBeenCalled();
+  });
+
   it('returns ok when Postgres and Redis are reachable', async () => {
     queryRaw.mockResolvedValue([{ '?column?': 1 }]);
     ping.mockResolvedValue('PONG');

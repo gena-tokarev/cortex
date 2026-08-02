@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { RolesGuard } from '@focoris/auth-nest';
+import { RolesGuard } from '@cortex/auth-nest';
 import { EmailAuthModule } from '../email-auth/email-auth.module';
 import { ExternalAuthModule } from '../external-auth/external-auth.module';
 import { IdentityModule } from '../identity/identity.module';

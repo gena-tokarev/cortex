@@ -1,5 +1,5 @@
 {
-  "name": "@focoris/auth-nest",
+  "name": "@cortex/auth-nest",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -10,7 +10,7 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "@focoris/source": "./src/index.ts",
+      "@cortex/source": "./src/index.ts",
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
     }

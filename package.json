@@ -1,23 +1,23 @@
 {
-  "name": "@focoris/source",
+  "name": "@cortex/source",
   "version": "0.0.0",
   "license": "MIT",
   "packageManager": "bun@1.2.19",
   "scripts": {
     "build": "turbo run build",
-    "build:auth-api": "turbo run build --filter=@focoris/auth-api",
-    "build:web": "turbo run build --filter=@focoris/web",
+    "build:auth-api": "turbo run build --filter=@cortex/auth-api",
+    "build:web": "turbo run build --filter=@cortex/web",
     "dev": "turbo run dev --parallel",
-    "dev:auth-api": "turbo run dev --filter=@focoris/auth-api",
-    "dev:web": "turbo run dev --filter=@focoris/web",
+    "dev:auth-api": "turbo run dev --filter=@cortex/auth-api",
+    "dev:web": "turbo run dev --filter=@cortex/web",
     "lint": "turbo run lint",
     "test": "turbo run test",
-    "test:auth-api": "turbo run test --filter=@focoris/auth-api",
+    "test:auth-api": "turbo run test --filter=@cortex/auth-api",
     "e2e": "turbo run e2e",
-    "e2e:auth-api": "turbo run e2e --filter=@focoris/auth-api-e2e",
-    "db:generate": "turbo run db:generate --filter=@focoris/auth-api",
-    "db:migrate": "turbo run db:migrate --filter=@focoris/auth-api",
-    "db:seed": "turbo run db:seed --filter=@focoris/auth-api"
+    "e2e:auth-api": "turbo run e2e --filter=@cortex/auth-api-e2e",
+    "db:generate": "turbo run db:generate --filter=@cortex/auth-api",
+    "db:migrate": "turbo run db:migrate --filter=@cortex/auth-api",
+    "db:seed": "turbo run db:seed --filter=@cortex/auth-api"
   },
   "private": true,
   "workspaces": [

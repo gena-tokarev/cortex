@@ -9,8 +9,8 @@ import {
   UseInterceptors,
   UseGuards,
 } from '@nestjs/common';
-import { CurrentUser, Roles, RolesGuard } from '@focoris/auth-nest';
-import type { AuthJwtPayload } from '@focoris/auth-nest';
+import { CurrentUser, Roles, RolesGuard } from '@cortex/auth-nest';
+import type { AuthJwtPayload } from '@cortex/auth-nest';
 import { AuthCoreService } from './auth-core.service';
 import {
   AuthTokenPairDto,

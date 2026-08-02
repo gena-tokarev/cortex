@@ -1,9 +1,9 @@
 {
-  "name": "@focoris/auth-api-e2e",
+  "name": "@cortex/auth-api-e2e",
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "e2e": "NODE_OPTIONS='--conditions=@focoris/source' jest --config jest.config.cjs --runInBand",
+    "e2e": "NODE_OPTIONS='--conditions=@cortex/source' jest --config jest.config.cjs --runInBand",
     "lint": "eslint . --ext .ts"
   },
   "devDependencies": {
@@ -13,7 +13,7 @@
     "testcontainers": "^10.28.0"
   },
   "dependencies": {
-    "@focoris/auth-api": "workspace:*",
+    "@cortex/auth-api": "workspace:*",
     "@testcontainers/postgresql": "^11.12.0"
   }
 }

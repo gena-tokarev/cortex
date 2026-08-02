@@ -13,6 +13,11 @@ export class HealthController {
     private readonly redis: RedisService,
   ) {}
 
+  @Get('live')
+  live(): { status: 'ok' } {
+    return { status: 'ok' };
+  }
+
   @Get()
   async check(): Promise<{ status: 'ok' }> {
     try {

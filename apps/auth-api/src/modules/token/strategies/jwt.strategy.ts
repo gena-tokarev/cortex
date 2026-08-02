@@ -2,7 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { ConfigService } from '@nestjs/config';
-import { AuthJwtPayload, JwtTokenType } from '@focoris/auth-nest';
+import { AuthJwtPayload, JwtTokenType } from '@cortex/auth-nest';
 import type { AppEnv } from '../../../config/config.validation';
 import {
   AuthErrorCode,

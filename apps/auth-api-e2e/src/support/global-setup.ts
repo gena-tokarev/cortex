@@ -71,9 +71,9 @@ module.exports = async function () {
   const authApiPort = process.env.AUTH_API_PORT
     ? Number(process.env.AUTH_API_PORT)
     : 3001;
-  const pgUser = process.env.TEST_DB_USER ?? 'focoris';
-  const pgPassword = process.env.TEST_DB_PASSWORD ?? 'focoris';
-  const pgDb = process.env.TEST_DB_NAME ?? 'focoris_auth_test';
+  const pgUser = process.env.TEST_DB_USER ?? 'cortex';
+  const pgPassword = process.env.TEST_DB_PASSWORD ?? 'cortex';
+  const pgDb = process.env.TEST_DB_NAME ?? 'cortex_auth_test';
   const pgImage = process.env.TEST_DB_IMAGE ?? 'postgres:16-alpine';
   const redisImage = process.env.TEST_REDIS_IMAGE ?? 'redis:7-alpine';
 
@@ -106,7 +106,7 @@ module.exports = async function () {
     DATABASE_URL: dbUrl,
     GOOGLE_ALLOWED_NATIVE_REDIRECT_URIS:
       process.env.GOOGLE_ALLOWED_NATIVE_REDIRECT_URIS ??
-      'focoris://auth/callback',
+      'cortex://auth/callback',
     GOOGLE_ALLOWED_WEB_REDIRECT_URIS:
       process.env.GOOGLE_ALLOWED_WEB_REDIRECT_URIS ??
       `http://${host}:${authApiPort}`,
@@ -120,7 +120,7 @@ module.exports = async function () {
       process.env.PASSKEY_ALLOWED_ORIGINS ??
       `http://${host}:${authApiPort}`,
     PASSKEY_RP_ID: process.env.PASSKEY_RP_ID ?? host,
-    PASSKEY_RP_NAME: process.env.PASSKEY_RP_NAME ?? 'Focoris E2E',
+    PASSKEY_RP_NAME: process.env.PASSKEY_RP_NAME ?? 'Cortex E2E',
     PORT: String(authApiPort),
     REDIS_URL: redisUrl,
   };

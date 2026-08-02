@@ -1,5 +1,5 @@
 {
-  "name": "@focoris/auth-api",
+  "name": "@cortex/auth-api",
   "version": "0.0.1",
   "private": true,
   "scripts": {
@@ -8,7 +8,7 @@
     "dev:debug": "nest start --debug --watch",
     "lint": "eslint . --ext .ts",
     "start": "node dist/main.js",
-    "test": "NODE_OPTIONS='--conditions=@focoris/source' jest --config jest.config.cjs --runInBand",
+    "test": "NODE_OPTIONS='--conditions=@cortex/source' jest --config jest.config.cjs --runInBand",
     "db:generate": "prisma generate --schema prisma/schema.prisma",
     "db:migrate": "prisma migrate dev --schema prisma/schema.prisma",
     "db:seed": "prisma db seed --schema prisma/schema.prisma"
@@ -24,8 +24,8 @@
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.0.0",
     "@prisma/client": "^6.19.2",
-    "@focoris/auth-nest": "workspace:*",
-    "@focoris/encoding": "workspace:*",
+    "@cortex/auth-nest": "workspace:*",
+    "@cortex/encoding": "workspace:*",
     "@simplewebauthn/server": "^13.3.1",
     "bcryptjs": "^3.0.0",
     "class-transformer": "^0.5.1",

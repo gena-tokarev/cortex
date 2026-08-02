@@ -46,7 +46,7 @@ describe('ExternalAuthService', () => {
   it('creates a one-time completion code', async () => {
     const user: IdentityUser = {
       id: 'user-3',
-      email: 'code@focoris.local',
+      email: 'code@cortex.local',
       roles: [],
     };
 
@@ -55,7 +55,7 @@ describe('ExternalAuthService', () => {
     await expect(
       service.createCompletionCode(
         user,
-        'focoris://auth/callback',
+        'cortex://auth/callback',
         'native',
       ),
     ).resolves.toBe('external-code');
@@ -63,7 +63,7 @@ describe('ExternalAuthService', () => {
     expect(externalAuthCodeStore.create).toHaveBeenCalledWith(
       {
         userId: 'user-3',
-        redirectUri: 'focoris://auth/callback',
+        redirectUri: 'cortex://auth/callback',
         platform: 'native',
       },
       300,
@@ -73,7 +73,7 @@ describe('ExternalAuthService', () => {
   it('exchanges a valid one-time code for tokens', async () => {
     const user: IdentityUser = {
       id: 'user-4',
-      email: 'exchange@focoris.local',
+      email: 'exchange@cortex.local',
       roles: [],
     };
     const loginResponse = {

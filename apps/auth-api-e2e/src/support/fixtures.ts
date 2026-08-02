@@ -13,7 +13,7 @@ export async function createAuthFixtureUser(
   prefix = 'e2e',
 ): Promise<AuthFixtureUser> {
   const password = 'Test1234!';
-  const email = `${prefix}+${randomUUID()}@focoris.local`;
+  const email = `${prefix}+${randomUUID()}@cortex.local`;
   const passwordHash = bcrypt.hashSync(password, 10);
 
   await prisma.user.create({

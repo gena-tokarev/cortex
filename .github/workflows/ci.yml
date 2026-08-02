@@ -11,8 +11,8 @@ permissions:
 
 env:
   REGISTRY: ghcr.io
-  AUTH_API_IMAGE: ghcr.io/gena-tokarev/focoris-auth-api
-  WEB_IMAGE: ghcr.io/gena-tokarev/focoris-web
+  AUTH_API_IMAGE: ghcr.io/gena-tokarev/cortex-auth-api
+  WEB_IMAGE: ghcr.io/gena-tokarev/cortex-web
 
 jobs:
   ci:
@@ -82,8 +82,8 @@ jobs:
             type=sha,format=long,prefix=sha-
             type=raw,value=development,enable=${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
           labels: |
-            org.opencontainers.image.title=Focoris Auth API
-            org.opencontainers.image.description=Focoris authentication API
+            org.opencontainers.image.title=Cortex Auth API
+            org.opencontainers.image.description=Cortex authentication API
 
       - name: Build and optionally publish image
         id: build
@@ -144,8 +144,8 @@ jobs:
             type=sha,format=long,prefix=sha-
             type=raw,value=development,enable=${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
           labels: |
-            org.opencontainers.image.title=Focoris Web
-            org.opencontainers.image.description=Focoris web application
+            org.opencontainers.image.title=Cortex Web
+            org.opencontainers.image.description=Cortex web application
 
       - name: Build and optionally publish image
         id: build
@@ -170,17 +170,106 @@ jobs:
           subject-digest: ${{ steps.build.outputs.digest }}
           push-to-registry: true
 
-  deploy-development:
-    name: Deploy development
+  promote-development:
+    name: Promote development release
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     needs:
       - build-auth-api
       - build-web
-    uses: ./.github/workflows/deploy-development.yml
-    with:
-      auth_image: ghcr.io/gena-tokarev/focoris-auth-api@${{ needs.build-auth-api.outputs.digest }}
-      web_image: ghcr.io/gena-tokarev/focoris-web@${{ needs.build-web.outputs.digest }}
-      source_sha: ${{ github.sha }}
-      enforce_current_main: true
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment:
+      name: development
+      url: https://cortex-dev.podolog-warsaw.pl
+    concurrency:
+      group: cortex-development-promotion
+      cancel-in-progress: false
     permissions:
       contents: read
+    steps:
+      - name: Check whether this is still main
+        id: currency
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          fetch-depth: 1
+
+      - name: Decide whether to promote
+        id: decision
+        env:
+          RELEASE_SHA: ${{ github.sha }}
+        run: |
+          set -eu
+          current_sha=$(git rev-parse HEAD)
+          if [ "$current_sha" = "$RELEASE_SHA" ]; then
+            echo "promote=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Skipping stale release $RELEASE_SHA; main is $current_sha."
+            echo "promote=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create infra repository token
+        if: steps.decision.outputs.promote == 'true'
+        id: app-token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3
+        with:
+          app-id: ${{ vars.INFRA_APP_ID }}
+          private-key: ${{ secrets.INFRA_APP_PRIVATE_KEY }}
+          owner: gena-tokarev
+          repositories: infra
+          permission-contents: write
+
+      - name: Check out infra repository
+        if: steps.decision.outputs.promote == 'true'
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: gena-tokarev/infra
+          ref: main
+          token: ${{ steps.app-token.outputs.token }}
+          path: infra
+          persist-credentials: true
+
+      - name: Commit immutable release to infra
+        if: steps.decision.outputs.promote == 'true'
+        env:
+          AUTH_DIGEST: ${{ needs.build-auth-api.outputs.digest }}
+          WEB_DIGEST: ${{ needs.build-web.outputs.digest }}
+          RELEASE_SHA: ${{ github.sha }}
+        working-directory: infra
+        run: |
+          set -eu
+          printf '%s\n' "$AUTH_DIGEST" | grep -Eq '^sha256:[0-9a-f]{64}$'
+          printf '%s\n' "$WEB_DIGEST" | grep -Eq '^sha256:[0-9a-f]{64}$'
+
+          install -d environments/development/cortex
+          {
+            echo "sourceSha: \"$RELEASE_SHA\""
+            echo "authApi:"
+            echo "  image:"
+            echo "    repository: ghcr.io/gena-tokarev/cortex-auth-api"
+            echo "    digest: \"$AUTH_DIGEST\""
+            echo "web:"
+            echo "  image:"
+            echo "    repository: ghcr.io/gena-tokarev/cortex-web"
+            echo "    digest: \"$WEB_DIGEST\""
+          } > environments/development/cortex/release.yaml
+
+          git config user.name "${{ steps.app-token.outputs.app-slug }}[bot]"
+          git config user.email "41898282+${{ steps.app-token.outputs.app-slug }}[bot]@users.noreply.github.com"
+          git add environments/development/cortex/release.yaml
+          if git diff --cached --quiet; then
+            echo "Infra already contains this release."
+            exit 0
+          fi
+          git commit -m "deploy(cortex): $RELEASE_SHA"
+
+          attempts=0
+          until git push origin HEAD:main; do
+            attempts=$((attempts + 1))
+            if [ "$attempts" -ge 5 ]; then
+              echo "Unable to promote after $attempts attempts." >&2
+              exit 1
+            fi
+            git fetch origin main
+            git rebase origin/main
+          done

@@ -23,7 +23,7 @@ describe('Passkey Auth API flow', () => {
   });
 
   it('should bootstrap passkey registration from email code', async () => {
-    const email = `${PASSKEY_FIXTURE_PREFIX}+${Date.now()}+code@focoris.local`;
+    const email = `${PASSKEY_FIXTURE_PREFIX}+${Date.now()}+code@cortex.local`;
 
     const request = await axios.post('/api/auth/email/request', { email });
 
@@ -43,7 +43,7 @@ describe('Passkey Auth API flow', () => {
   });
 
   it('should bootstrap passkey registration from magic link token', async () => {
-    const email = `${PASSKEY_FIXTURE_PREFIX}+${Date.now()}+link@focoris.local`;
+    const email = `${PASSKEY_FIXTURE_PREFIX}+${Date.now()}+link@cortex.local`;
 
     const request = await axios.post('/api/auth/email/request', { email });
 
@@ -73,7 +73,7 @@ describe('Passkey Auth API flow', () => {
     expect(withoutToken.status).toBe(401);
     expect(withoutToken.data.code).toBe('AUTH_MISSING_BEARER_TOKEN');
 
-    const email = `${PASSKEY_FIXTURE_PREFIX}+${Date.now()}+auth@focoris.local`;
+    const email = `${PASSKEY_FIXTURE_PREFIX}+${Date.now()}+auth@cortex.local`;
     const request = await axios.post('/api/auth/email/request', { email });
     const login = await axios.post(
       '/api/auth/email/verify-code',

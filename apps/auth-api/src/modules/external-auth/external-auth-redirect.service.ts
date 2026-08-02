@@ -10,7 +10,7 @@ import {
   AuthErrorCode,
   AuthErrorResponseDto,
 } from '../auth-core/dto/auth-response.dto';
-import { decodeBase64UrlJson, encodeBase64UrlJson } from '@focoris/encoding';
+import { decodeBase64UrlJson, encodeBase64UrlJson } from '@cortex/encoding';
 import { AuthPlatform } from '../session/session.types';
 import type {
   ExternalAuthPlatform,

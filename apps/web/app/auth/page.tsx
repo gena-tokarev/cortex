@@ -29,7 +29,7 @@ export default function AuthPage() {
             </div>
             <div className="max-w-xl space-y-5">
               <p className="text-sm font-semibold uppercase tracking-[0.24em] text-muted-foreground">
-                Focoris
+                Cortex
               </p>
               <h1 className="font-serif text-5xl leading-tight text-balance text-foreground">
                 A clean entry point for the future product experience.
@@ -66,7 +66,7 @@ export default function AuthPage() {
               <div className="mb-4 inline-flex w-fit items-center gap-2 rounded-full bg-accent px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-accent-foreground">
                 Auth Preview
               </div>
-              <CardTitle>Welcome to Focoris Web</CardTitle>
+              <CardTitle>Welcome to Cortex Web</CardTitle>
               <CardDescription>
                 The page is styled and ready. Backend auth wiring is the next
                 step, so the actions below are placeholders for now.
@@ -101,7 +101,7 @@ export default function AuthPage() {
                   <Input
                     id="email"
                     disabled
-                    placeholder="you@focoris.com"
+                    placeholder="you@cortex.com"
                     type="email"
                   />
                 </div>

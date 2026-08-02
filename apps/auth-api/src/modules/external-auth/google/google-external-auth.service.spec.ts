@@ -22,12 +22,12 @@ describe('GoogleExternalAuthService', () => {
   it('reuses an existing Google-linked user', async () => {
     const existingUser: IdentityUser = {
       id: 'user-1',
-      email: 'existing@focoris.local',
+      email: 'existing@cortex.local',
       roles: [],
     };
     const profile = createGoogleProfile({
       id: 'google-user-1',
-      emails: [{ value: 'existing@focoris.local', verified: true }],
+      emails: [{ value: 'existing@cortex.local', verified: true }],
     });
 
     identityService.findUserByIdentity.mockResolvedValue(existingUser);
@@ -44,15 +44,15 @@ describe('GoogleExternalAuthService', () => {
   it('creates a new user from the verified Google email', async () => {
     const createdUser: IdentityUser = {
       id: 'user-2',
-      email: 'verified@focoris.local',
+      email: 'verified@cortex.local',
       roles: [],
     };
     const profile = createGoogleProfile({
       id: 'google-user-2',
       displayName: 'Verified User',
       emails: [
-        { value: 'first@focoris.local', verified: false },
-        { value: 'verified@focoris.local', verified: true },
+        { value: 'first@cortex.local', verified: false },
+        { value: 'verified@cortex.local', verified: true },
       ],
     });
 
@@ -62,11 +62,11 @@ describe('GoogleExternalAuthService', () => {
     await expect(service.resolveUser(profile)).resolves.toBe(createdUser);
 
     expect(identityService.createUserWithIdentity).toHaveBeenCalledWith({
-      email: 'verified@focoris.local',
+      email: 'verified@cortex.local',
       identity: {
         provider: AuthProvider.google,
         providerUserId: 'google-user-2',
-        email: 'verified@focoris.local',
+        email: 'verified@cortex.local',
         emailVerified: true,
         displayName: 'Verified User',
       },

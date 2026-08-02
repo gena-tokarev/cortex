@@ -3,7 +3,7 @@
   "configVersion": 1,
   "workspaces": {
     "": {
-      "name": "@focoris/source",
+      "name": "@cortex/source",
       "dependencies": {
         "@nestjs/common": "^11.0.0",
         "@nestjs/config": "^4.0.3",
@@ -71,11 +71,11 @@
       },
     },
     "apps/auth-api": {
-      "name": "@focoris/auth-api",
+      "name": "@cortex/auth-api",
       "version": "0.0.1",
       "dependencies": {
-        "@focoris/auth-nest": "workspace:*",
-        "@focoris/encoding": "workspace:*",
+        "@cortex/auth-nest": "workspace:*",
+        "@cortex/encoding": "workspace:*",
         "@nestjs/common": "^11.0.0",
         "@nestjs/config": "^4.0.3",
         "@nestjs/core": "^11.0.0",
@@ -106,10 +106,10 @@
       },
     },
     "apps/auth-api-e2e": {
-      "name": "@focoris/auth-api-e2e",
+      "name": "@cortex/auth-api-e2e",
       "version": "0.0.1",
       "dependencies": {
-        "@focoris/auth-api": "workspace:*",
+        "@cortex/auth-api": "workspace:*",
         "@testcontainers/postgresql": "^11.12.0",
       },
       "devDependencies": {
@@ -120,7 +120,7 @@
       },
     },
     "apps/web": {
-      "name": "@focoris/web",
+      "name": "@cortex/web",
       "version": "0.0.1",
       "dependencies": {
         "@radix-ui/react-label": "^2.1.10",
@@ -136,11 +136,11 @@
       },
     },
     "libs/auth-nest": {
-      "name": "@focoris/auth-nest",
+      "name": "@cortex/auth-nest",
       "version": "0.0.1",
     },
     "libs/encoding": {
-      "name": "@focoris/encoding",
+      "name": "@cortex/encoding",
       "version": "0.0.1",
     },
   },
@@ -311,15 +311,15 @@
 
     "@fastify/busboy": ["@fastify/busboy@2.1.1", "", {}, "sha512-vBZP4NlzfOlerQTnba4aqZoMhE/a9HY7HRqoOPaETQcSQuWEIyZMHGfVu6w9wGtGK5fED5qRs2DteVCjOH60sA=="],
 
-    "@focoris/auth-api": ["@focoris/auth-api@workspace:apps/auth-api"],
+    "@cortex/auth-api": ["@cortex/auth-api@workspace:apps/auth-api"],
 
-    "@focoris/auth-api-e2e": ["@focoris/auth-api-e2e@workspace:apps/auth-api-e2e"],
+    "@cortex/auth-api-e2e": ["@cortex/auth-api-e2e@workspace:apps/auth-api-e2e"],
 
-    "@focoris/auth-nest": ["@focoris/auth-nest@workspace:libs/auth-nest"],
+    "@cortex/auth-nest": ["@cortex/auth-nest@workspace:libs/auth-nest"],
 
-    "@focoris/encoding": ["@focoris/encoding@workspace:libs/encoding"],
+    "@cortex/encoding": ["@cortex/encoding@workspace:libs/encoding"],
 
-    "@focoris/web": ["@focoris/web@workspace:apps/web"],
+    "@cortex/web": ["@cortex/web@workspace:apps/web"],
 
     "@grpc/grpc-js": ["@grpc/grpc-js@1.14.4", "", { "dependencies": { "@grpc/proto-loader": "^0.8.0", "@js-sdsl/ordered-map": "^4.4.2" } }, "sha512-k9Dj3DV/itK9D06Y8f190Qgop7/Ui+D0njFV3LHMPwPT75DpXLQohE9Wmz0QElrJnzsjB7KPWiKJbOl7IPDArQ=="],
 

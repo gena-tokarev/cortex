@@ -15,9 +15,9 @@ describe('AuthSessionService', () => {
       getOrThrow: jest.fn((key: string) => {
         switch (key) {
           case 'AUTH_COOKIE_ACCESS_TOKEN_NAME':
-            return 'focoris_access_token';
+            return 'cortex_access_token';
           case 'AUTH_COOKIE_REFRESH_TOKEN_NAME':
-            return 'focoris_refresh_token';
+            return 'cortex_refresh_token';
           case 'AUTH_COOKIE_SECURE':
             return false;
           case 'AUTH_COOKIE_SAME_SITE':

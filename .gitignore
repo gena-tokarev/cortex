@@ -60,7 +60,7 @@ auth-api-e2e/.tmp/
 
 __azurite_db_queue*
 
-# Local deployment credentials and host verification
+# Legacy local deployment credentials (never commit)
 focoris-actions-deploy
 focoris-actions-deploy.pub
 focoris-vps-known-hosts

@@ -19,9 +19,9 @@ describe('ExternalAuthRedirectService', () => {
           case 'AUTH_ACCESS_TOKEN_SECRET':
             return 'access-token-secret';
           case 'GOOGLE_ALLOWED_WEB_REDIRECT_URIS':
-            return 'http://localhost:3000,https://app.focoris.com/auth/callback';
+            return 'http://localhost:3000,https://app.cortex.com/auth/callback';
           case 'GOOGLE_ALLOWED_NATIVE_REDIRECT_URIS':
-            return 'focoris://auth/callback,myapp://oauth/*';
+            return 'cortex://auth/callback,myapp://oauth/*';
           default:
             throw new Error(`Unexpected config lookup: ${key}`);
         }
@@ -31,22 +31,22 @@ describe('ExternalAuthRedirectService', () => {
 
   it('accepts an allowed web redirect and preserves it through state', () => {
     const state = service.createState({
-      redirectUri: 'https://app.focoris.com/auth/callback',
+      redirectUri: 'https://app.cortex.com/auth/callback',
     }, AuthPlatform.Web);
 
     expect(service.parseState(state)).toEqual({
-      redirectUri: 'https://app.focoris.com/auth/callback',
+      redirectUri: 'https://app.cortex.com/auth/callback',
       platform: 'web',
     });
   });
 
   it('accepts an allowed native redirect and preserves it through state', () => {
     const state = service.createState({
-      redirectUri: 'focoris://auth/callback',
+      redirectUri: 'cortex://auth/callback',
     }, AuthPlatform.Native);
 
     expect(service.parseState(state)).toEqual({
-      redirectUri: 'focoris://auth/callback',
+      redirectUri: 'cortex://auth/callback',
       platform: 'native',
     });
   });
@@ -61,7 +61,7 @@ describe('ExternalAuthRedirectService', () => {
 
   it('rejects a tampered state payload', () => {
     const state = service.createState({
-      redirectUri: 'focoris://auth/callback',
+      redirectUri: 'cortex://auth/callback',
     }, AuthPlatform.Native);
 
     expect(() => service.parseState(`${state}x`)).toThrow(UnauthorizedException);
@@ -71,11 +71,11 @@ describe('ExternalAuthRedirectService', () => {
     expect(
       service.createSuccessRedirect(
         {
-          redirectUri: 'focoris://auth/callback?source=google',
+          redirectUri: 'cortex://auth/callback?source=google',
           platform: 'native',
         },
         'code-123',
       ),
-    ).toBe('focoris://auth/callback?source=google&code=code-123&status=success');
+    ).toBe('cortex://auth/callback?source=google&code=code-123&status=success');
   });
 });

@@ -4,7 +4,7 @@ import bcrypt from 'bcryptjs';
 const prisma = new PrismaClient();
 
 async function main() {
-  const email = 'admin@focoris.local';
+  const email = 'admin@cortex.local';
   const passwordHash = bcrypt.hashSync('admin123', 10);
 
   await prisma.user.upsert({

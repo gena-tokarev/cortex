@@ -9,14 +9,14 @@ const swcJestConfig = JSON.parse(
 swcJestConfig.swcrc = false;
 
 module.exports = {
-  displayName: '@focoris/auth-api',
+  displayName: '@cortex/auth-api',
   testEnvironment: 'node',
   transform: {
     '^.+\\.[tj]s$': ['@swc/jest', swcJestConfig],
   },
   moduleNameMapper: {
-    '^@focoris/auth-nest$': '<rootDir>/../../libs/auth-nest/src/index.ts',
-    '^@focoris/encoding$': '<rootDir>/../../libs/encoding/src/index.ts',
+    '^@cortex/auth-nest$': '<rootDir>/../../libs/auth-nest/src/index.ts',
+    '^@cortex/encoding$': '<rootDir>/../../libs/encoding/src/index.ts',
   },
   moduleFileExtensions: ['ts', 'js', 'html'],
   coverageDirectory: 'test-output/jest/coverage',

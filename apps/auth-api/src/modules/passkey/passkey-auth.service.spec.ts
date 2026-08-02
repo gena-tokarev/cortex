@@ -76,7 +76,7 @@ describe('PasskeyAuthService', () => {
           case 'PASSKEY_RP_ID':
             return 'localhost';
           case 'PASSKEY_RP_NAME':
-            return 'Focoris Auth';
+            return 'Cortex Auth';
           case 'PASSKEY_ALLOWED_ORIGINS':
             return 'http://localhost:3001';
           default:
@@ -99,7 +99,7 @@ describe('PasskeyAuthService', () => {
   it('starts authenticated registration and excludes existing passkeys', async () => {
     const authUser: IdentityUser = {
       id: 'user-1',
-      email: 'user@focoris.local',
+      email: 'user@cortex.local',
       roles: [],
     };
     const existingPasskey = {
@@ -184,7 +184,7 @@ describe('PasskeyAuthService', () => {
   it('verifies email code and returns a registration challenge', async () => {
     const user: IdentityUser = {
       id: 'user-2',
-      email: 'verified@focoris.local',
+      email: 'verified@cortex.local',
       roles: [],
     };
     emailAuthVerificationService.verifyEmailCode.mockResolvedValue(user);
@@ -219,7 +219,7 @@ describe('PasskeyAuthService', () => {
   it('completes passkey registration and stores the credential', async () => {
     const user = {
       id: 'user-3',
-      email: 'passkey@focoris.local',
+      email: 'passkey@cortex.local',
       roles: [],
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -338,7 +338,7 @@ describe('PasskeyAuthService', () => {
         id: 'identity-4',
         provider: AuthProvider.passkey,
         providerUserId: 'user-4',
-        email: 'user4@focoris.local',
+        email: 'user4@cortex.local',
         emailVerified: true,
         displayName: null,
         passwordHash: null,
@@ -347,7 +347,7 @@ describe('PasskeyAuthService', () => {
         updatedAt: new Date(),
         user: {
           id: 'user-4',
-          email: 'user4@focoris.local',
+          email: 'user4@cortex.local',
           roles: [],
           createdAt: new Date(),
           updatedAt: new Date(),
@@ -357,7 +357,7 @@ describe('PasskeyAuthService', () => {
     const loginResponse = {
       user: {
         id: 'user-4',
-        email: 'user4@focoris.local',
+        email: 'user4@cortex.local',
         roles: [],
       },
       tokens: {

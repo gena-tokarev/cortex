@@ -26,12 +26,12 @@ describe('GoogleExternalAuthController', () => {
 
   it('redirects successful callbacks to the client with a one-time code', async () => {
     externalAuthRedirectService.parseState.mockReturnValue({
-      redirectUri: 'focoris://auth/callback',
+      redirectUri: 'cortex://auth/callback',
       platform: 'native',
     });
     externalAuthService.createCompletionCode.mockResolvedValue('code-1');
     externalAuthRedirectService.createSuccessRedirect.mockReturnValue(
-      'focoris://auth/callback?code=code-1&status=success',
+      'cortex://auth/callback?code=code-1&status=success',
     );
 
     const response = {
@@ -40,19 +40,19 @@ describe('GoogleExternalAuthController', () => {
 
     await controller.callback(
       {
-        user: { id: 'user-1', email: 'user@focoris.local', roles: [] },
+        user: { id: 'user-1', email: 'user@cortex.local', roles: [] },
         query: { state: 'state-1' },
       },
       response as never,
     );
 
     expect(externalAuthService.createCompletionCode).toHaveBeenCalledWith(
-      { id: 'user-1', email: 'user@focoris.local', roles: [] },
-      'focoris://auth/callback',
+      { id: 'user-1', email: 'user@cortex.local', roles: [] },
+      'cortex://auth/callback',
       'native',
     );
     expect(response.redirect).toHaveBeenCalledWith(
-      'focoris://auth/callback?code=code-1&status=success',
+      'cortex://auth/callback?code=code-1&status=success',
     );
   });
 

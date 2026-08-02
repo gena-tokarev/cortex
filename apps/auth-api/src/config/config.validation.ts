@@ -10,11 +10,11 @@ export const envSchema = z.object({
   AUTH_COOKIE_ACCESS_TOKEN_NAME: z
     .string()
     .min(1)
-    .default('focoris_access_token'),
+    .default('cortex_access_token'),
   AUTH_COOKIE_REFRESH_TOKEN_NAME: z
     .string()
     .min(1)
-    .default('focoris_refresh_token'),
+    .default('cortex_refresh_token'),
   AUTH_COOKIE_DOMAIN: z.string().min(1).optional(),
   AUTH_COOKIE_SECURE: z.coerce.boolean().default(false),
   AUTH_COOKIE_SAME_SITE: z.enum(['lax', 'strict', 'none']).default('lax'),
@@ -34,7 +34,7 @@ export const envSchema = z.object({
   GOOGLE_ALLOWED_NATIVE_REDIRECT_URIS: z
     .string()
     .min(1)
-    .default('focoris://auth/callback'),
+    .default('cortex://auth/callback'),
   PASSKEY_RP_ID: z.string().min(1),
   PASSKEY_RP_NAME: z.string().min(1),
   PASSKEY_ALLOWED_ORIGINS: z.string().min(1),

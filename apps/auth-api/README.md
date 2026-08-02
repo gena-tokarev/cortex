@@ -1,6 +1,6 @@
 # Auth API
 
-NestJS auth service for the Focoris workspace.
+NestJS auth service for the Cortex workspace.
 
 ## Runtime
 

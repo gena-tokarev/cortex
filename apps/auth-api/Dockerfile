@@ -22,7 +22,7 @@ RUN bun run build:auth-api
 
 FROM manifests AS production-dependencies
 
-RUN bun install --frozen-lockfile --production --filter @focoris/auth-api
+RUN bun install --frozen-lockfile --production --filter @cortex/auth-api
 COPY apps/auth-api/prisma/schema.prisma apps/auth-api/prisma/schema.prisma
 RUN bunx --bun prisma generate --schema apps/auth-api/prisma/schema.prisma
 
